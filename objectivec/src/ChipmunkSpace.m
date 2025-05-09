@@ -204,10 +204,10 @@ static void Separate(cpArbiter *arb, struct cpSpace *space, HandlerContext *ctx)
 	[_handlers addObject:data];
 	
 	cpCollisionHandler *handler = cpSpaceAddDefaultCollisionHandler(_space);
-	if(begin) handler->beginFunc = (cpCollisionBeginFunc)Begin;
-	if(preSolve) handler->preSolveFunc = (cpCollisionPreSolveFunc)PreSolve;
-	if(postSolve) handler->postSolveFunc = (cpCollisionPostSolveFunc)PostSolve;
-	if(separate) handler->separateFunc = (cpCollisionSeparateFunc)Separate;
+    if(begin) handler->beginFunc = (cpCollisionBeginFunc)(void *)Begin;
+	if(preSolve) handler->preSolveFunc = (cpCollisionPreSolveFunc)(void *)PreSolve;
+	if(postSolve) handler->postSolveFunc = (cpCollisionPostSolveFunc)(void *)PostSolve;
+	if(separate) handler->separateFunc = (cpCollisionSeparateFunc)(void *)Separate;
 	handler->userData = (void *)[data bytes];
 }
 	
@@ -223,10 +223,10 @@ static void Separate(cpArbiter *arb, struct cpSpace *space, HandlerContext *ctx)
 	[_handlers addObject:data];
 	
 	cpCollisionHandler *handler = cpSpaceAddCollisionHandler(_space, a, b);
-	if(begin) handler->beginFunc = (cpCollisionBeginFunc)Begin;
-	if(preSolve) handler->preSolveFunc = (cpCollisionPreSolveFunc)PreSolve;
-	if(postSolve) handler->postSolveFunc = (cpCollisionPostSolveFunc)PostSolve;
-	if(separate) handler->separateFunc = (cpCollisionSeparateFunc)Separate;
+	if(begin) handler->beginFunc = (cpCollisionBeginFunc)(void *)Begin;
+	if(preSolve) handler->preSolveFunc = (cpCollisionPreSolveFunc)(void *)PreSolve;
+	if(postSolve) handler->postSolveFunc = (cpCollisionPostSolveFunc)(void *)PostSolve;
+	if(separate) handler->separateFunc = (cpCollisionSeparateFunc)(void *)Separate;
 	handler->userData = (void *)[data bytes];
 }
 
@@ -305,7 +305,7 @@ postStepPerform(cpSpace *unused, id key, struct PostStepTargetContext *context)
 	if(!cpSpaceGetPostStepCallback(_space, key)){
 		struct PostStepTargetContext *context = cpcalloc(1, sizeof(struct PostStepTargetContext));
 		(*context) = (struct PostStepTargetContext){target, selector};
-		cpSpaceAddPostStepCallback(_space, (cpPostStepFunc)postStepPerform, key, context);
+		cpSpaceAddPostStepCallback(_space, (cpPostStepFunc)(void *)postStepPerform, key, context);
 		
 		[target retain];
 		[key retain];
@@ -328,7 +328,7 @@ postStepPerformBlock(cpSpace *unused, id key, ChipmunkPostStepBlock block)
 - (BOOL)addPostStepBlock:(ChipmunkPostStepBlock)block key:(id)key
 {
 	if(!cpSpaceGetPostStepCallback(_space, key)){
-		cpSpaceAddPostStepCallback(_space, (cpPostStepFunc)postStepPerformBlock, key, [block copy]);
+		cpSpaceAddPostStepCallback(_space, (cpPostStepFunc)(void *)postStepPerformBlock, key, [block copy]);
 		
 		[key retain];
 		
@@ -432,7 +432,7 @@ static void PushBody(cpBody *body, NSMutableArray *arr){[arr addObject:body->use
 - (NSArray *)bodies
 {
 	NSMutableArray *arr = [NSMutableArray array];
-	cpSpaceEachBody(_space, (cpSpaceBodyIteratorFunc)PushBody, arr);
+	cpSpaceEachBody(_space, (cpSpaceBodyIteratorFunc)(void *)PushBody, arr);
 	
 	return arr;
 }
@@ -441,7 +441,7 @@ static void PushShape(cpShape *shape, NSMutableArray *arr){[arr addObject:shape-
 - (NSArray *)shapes
 {
 	NSMutableArray *arr = [NSMutableArray array];
-	cpSpaceEachShape(_space, (cpSpaceShapeIteratorFunc)PushShape, arr);
+	cpSpaceEachShape(_space, (cpSpaceShapeIteratorFunc)(void *)PushShape, arr);
 	
 	return arr;
 }
@@ -450,7 +450,7 @@ static void PushConstraint(cpConstraint *constraint, NSMutableArray *arr){[arr a
 - (NSArray *)constraints
 {
 	NSMutableArray *arr = [NSMutableArray array];
-	cpSpaceEachConstraint(_space, (cpSpaceConstraintIteratorFunc)PushConstraint, arr);
+	cpSpaceEachConstraint(_space, (cpSpaceConstraintIteratorFunc)(void *)PushConstraint, arr);
 	
 	return arr;
 }

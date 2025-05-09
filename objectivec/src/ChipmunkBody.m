@@ -182,7 +182,7 @@ static void PushShape(cpBody *ignored, cpShape *shape, NSMutableArray *arr){[arr
 - (NSArray *)shapes
 {
 	NSMutableArray *arr = [NSMutableArray array];
-	cpBodyEachShape(&_body, (cpBodyShapeIteratorFunc)PushShape, arr);
+	cpBodyEachShape(&_body, (cpBodyShapeIteratorFunc)(void *)PushShape, arr);
 	
 	return arr;
 }
@@ -191,7 +191,7 @@ static void PushConstraint(cpBody *ignored, cpConstraint *constraint, NSMutableA
 - (NSArray *)constraints
 {
 	NSMutableArray *arr = [NSMutableArray array];
-	cpBodyEachConstraint(&_body, (cpBodyConstraintIteratorFunc)PushConstraint, arr);
+	cpBodyEachConstraint(&_body, (cpBodyConstraintIteratorFunc)(void *)PushConstraint, arr);
 	
 	return arr;
 }
@@ -199,7 +199,7 @@ static void PushConstraint(cpBody *ignored, cpConstraint *constraint, NSMutableA
 static void CallArbiterBlock(cpBody *body, cpArbiter *arbiter, ChipmunkBodyArbiterIteratorBlock block){block(arbiter);}
 - (void)eachArbiter:(ChipmunkBodyArbiterIteratorBlock)block
 {
-	cpBodyEachArbiter(&_body, (cpBodyArbiterIteratorFunc)CallArbiterBlock, block);
+	cpBodyEachArbiter(&_body, (cpBodyArbiterIteratorFunc)(void *)CallArbiterBlock, block);
 }
 
 @end
