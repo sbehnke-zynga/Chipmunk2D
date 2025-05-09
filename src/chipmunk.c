@@ -275,8 +275,7 @@ cpConvexHull(int count, const cpVect *verts, cpVect *result, int *first, cpFloat
 
 //MARK: Alternate Block Iterators
 
-#if defined(__has_extension)
-#if __has_extension(blocks)
+#if USE_BLOCKS
 
 static void IteratorFunc(void *ptr, void (^block)(void *ptr)){block(ptr);}
 
@@ -321,11 +320,10 @@ void cpSpaceBBQuery_b(cpSpace *space, cpBB bb, cpShapeFilter filter, cpSpaceBBQu
 }
 
 static void ShapeQueryIteratorFunc(cpShape *shape, cpContactPointSet *points, cpSpaceShapeQueryBlock block){block(shape, points);}
-cpBool cpSpaceShapeQuery_b(cpSpace *space, cpShape *shape, cpSpaceShapeQueryBlock block){
+bool cpSpaceShapeQuery_b(cpSpace *space, cpShape *shape, cpSpaceShapeQueryBlock block){
 	return cpSpaceShapeQuery(space, shape, (cpSpaceShapeQueryFunc)ShapeQueryIteratorFunc, block);
 }
 
-#endif
 #endif
 
 #include "chipmunk/chipmunk_ffi.h"

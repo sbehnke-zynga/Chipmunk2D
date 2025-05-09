@@ -302,7 +302,7 @@ EPARecurse(const struct SupportContext *ctx, const int count, const struct Minko
 	
 	// The usual exit condition is a duplicated vertex.
 	// Much faster to check the ids than to check the signed area.
-	cpBool duplicate = (p.id == v0.id || p.id == v1.id);
+	bool duplicate = (p.id == v0.id || p.id == v1.id);
 	
 	if(!duplicate && cpCheckPointGreater(v0.ab, v1.ab, p.ab) && iteration < MAX_EPA_ITERATIONS){
 		// Rebuild the convex hull by inserting p.
@@ -681,7 +681,7 @@ CircleToPoly(const cpCircleShape *circle, const cpPolyShape *poly, struct cpColl
 static void
 CollisionError(const cpShape *circle, const cpShape *poly, struct cpCollisionInfo *info)
 {
-	cpAssertHard(cpFalse, "Internal Error: Shape types are not sorted.");
+	cpAssertHard(false, "Internal Error: Shape types are not sorted.");
 }
 
 

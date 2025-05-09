@@ -27,7 +27,7 @@
 //MARK: Contact Set Helpers
 
 // Equal function for arbiterSet.
-static cpBool
+static int
 arbiterSetEql(cpShape **shapes, cpArbiter *arb)
 {
 	cpShape *a = shapes[0];
@@ -39,7 +39,7 @@ arbiterSetEql(cpShape **shapes, cpArbiter *arb)
 //MARK: Collision Handler Set HelperFunctions
 
 // Equals function for collisionHandlers.
-static cpBool
+static int
 handlerSetEql(cpCollisionHandler *check, cpCollisionHandler *pair)
 {
 	return (
@@ -62,28 +62,28 @@ handlerSetTrans(cpCollisionHandler *handler, void *unused)
 
 // Default collision functions.
 
-static cpBool
-DefaultBegin(cpArbiter *arb, cpSpace *space, cpDataPointer data){
-	cpBool retA = cpArbiterCallWildcardBeginA(arb, space);
-	cpBool retB = cpArbiterCallWildcardBeginB(arb, space);
+static bool
+DefaultBegin(cpArbiter *arb, cpSpace *space, void *data){
+	bool retA = cpArbiterCallWildcardBeginA(arb, space);
+	bool retB = cpArbiterCallWildcardBeginB(arb, space);
 	return retA && retB;
 }
 
-static cpBool
-DefaultPreSolve(cpArbiter *arb, cpSpace *space, cpDataPointer data){
-	cpBool retA = cpArbiterCallWildcardPreSolveA(arb, space);
-	cpBool retB = cpArbiterCallWildcardPreSolveB(arb, space);
+static bool
+DefaultPreSolve(cpArbiter *arb, cpSpace *space, void *data){
+	bool retA = cpArbiterCallWildcardPreSolveA(arb, space);
+	bool retB = cpArbiterCallWildcardPreSolveB(arb, space);
 	return retA && retB;
 }
 
 static void
-DefaultPostSolve(cpArbiter *arb, cpSpace *space, cpDataPointer data){
+DefaultPostSolve(cpArbiter *arb, cpSpace *space, void *data){
 	cpArbiterCallWildcardPostSolveA(arb, space);
 	cpArbiterCallWildcardPostSolveB(arb, space);
 }
 
 static void
-DefaultSeparate(cpArbiter *arb, cpSpace *space, cpDataPointer data){
+DefaultSeparate(cpArbiter *arb, cpSpace *space, void *data){
 	cpArbiterCallWildcardSeparateA(arb, space);
 	cpArbiterCallWildcardSeparateB(arb, space);
 }
@@ -94,8 +94,8 @@ static cpCollisionHandler cpCollisionHandlerDefault = {
 	DefaultBegin, DefaultPreSolve, DefaultPostSolve, DefaultSeparate, NULL
 };
 
-static cpBool AlwaysCollide(cpArbiter *arb, cpSpace *space, cpDataPointer data){return cpTrue;}
-static void DoNothing(cpArbiter *arb, cpSpace *space, cpDataPointer data){}
+static bool AlwaysCollide(cpArbiter *arb, cpSpace *space, void *data){return true;}
+static void DoNothing(cpArbiter *arb, cpSpace *space, void *data){}
 
 cpCollisionHandler cpCollisionHandlerDoNothing = {
 	CP_WILDCARD_COLLISION_TYPE, CP_WILDCARD_COLLISION_TYPE,
@@ -120,11 +120,11 @@ cpSpace*
 cpSpaceInit(cpSpace *space)
 {
 #ifndef NDEBUG
-	static cpBool done = cpFalse;
+	static bool done = false;
 	if(!done){
 		printf("Initializing cpSpace - Chipmunk v%s (Debug Enabled)\n", cpVersionString);
 		printf("Compile with -DNDEBUG defined to disable debug mode and runtime assertion checks\n");
-		done = cpTrue;
+		done = true;
 	}
 #endif
 
@@ -163,12 +163,12 @@ cpSpaceInit(cpSpace *space)
 	
 	space->constraints = cpArrayNew(0);
 	
-	space->usesWildcards = cpFalse;
+	space->usesWildcards = false;
 	memcpy(&space->defaultHandler, &cpCollisionHandlerDoNothing, sizeof(cpCollisionHandler));
 	space->collisionHandlers = cpHashSetNew(0, (cpHashSetEqlFunc)handlerSetEql);
 	
 	space->postStepCallbacks = cpArrayNew(0);
-	space->skipPostStep = cpFalse;
+	space->skipPostStep = false;
 	
 	cpBody *staticBody = cpBodyInit(&space->_staticBody, 0.0f, 0.0f);
 	cpBodySetType(staticBody, CP_BODY_TYPE_STATIC);
@@ -371,7 +371,7 @@ cpSpaceSetStaticBody(cpSpace *space, cpBody *body)
 	body->space = space;
 }
 
-cpBool
+bool
 cpSpaceIsLocked(cpSpace *space)
 {
 	return (space->locked > 0);
@@ -384,7 +384,7 @@ cpSpaceUseWildcardDefaultHandler(cpSpace *space)
 {
 	// Spaces default to using the slightly faster "do nothing" default handler until wildcards are potentially needed.
 	if(!space->usesWildcards){
-		space->usesWildcards = cpTrue;
+		space->usesWildcards = true;
 		memcpy(&space->defaultHandler, &cpCollisionHandlerDefault, sizeof(cpCollisionHandler));
 	}
 }
@@ -425,7 +425,7 @@ cpSpaceAddShape(cpSpace *space, cpShape *shape)
 	
 	cpBody *body = shape->body;
 	
-	cpBool isStatic = (cpBodyGetType(body) == CP_BODY_TYPE_STATIC);
+	bool isStatic = (cpBodyGetType(body) == CP_BODY_TYPE_STATIC);
 	if(!isStatic) cpBodyActivate(body);
 	cpBodyAddShape(body, shape);
 	
@@ -479,7 +479,7 @@ struct arbiterFilterContext {
 	cpShape *shape;
 };
 
-static cpBool
+static bool
 cachedArbitersFilter(cpArbiter *arb, struct arbiterFilterContext *context)
 {
 	cpShape *shape = context->shape;
@@ -504,10 +504,10 @@ cachedArbitersFilter(cpArbiter *arb, struct arbiterFilterContext *context)
 		cpArrayDeleteObj(context->space->arbiters, arb);
 		cpArrayPush(context->space->pooledArbiters, arb);
 		
-		return cpFalse;
+		return false;
 	}
 	
-	return cpTrue;
+	return true;
 }
 
 void
@@ -516,7 +516,7 @@ cpSpaceFilterArbiters(cpSpace *space, cpBody *body, cpShape *filter)
 	cpSpaceLock(space); {
 		struct arbiterFilterContext context = {space, body, filter};
 		cpHashSetFilter(space->cachedArbiters, (cpHashSetFilterFunc)cachedArbitersFilter, &context);
-	} cpSpaceUnlock(space, cpTrue);
+	} cpSpaceUnlock(space, true);
 }
 
 void
@@ -526,7 +526,7 @@ cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
 	cpAssertHard(cpSpaceContainsShape(space, shape), "Cannot remove a shape that was not added to the space. (Removed twice maybe?)");
 	cpAssertSpaceUnlocked(space);
 	
-	cpBool isStatic = (cpBodyGetType(body) == CP_BODY_TYPE_STATIC);
+	bool isStatic = (cpBodyGetType(body) == CP_BODY_TYPE_STATIC);
 	if(isStatic){
 		cpBodyActivateStatic(body, shape);
 	} else {
@@ -570,17 +570,17 @@ cpSpaceRemoveConstraint(cpSpace *space, cpConstraint *constraint)
 	constraint->space = NULL;
 }
 
-cpBool cpSpaceContainsShape(cpSpace *space, cpShape *shape)
+bool cpSpaceContainsShape(cpSpace *space, cpShape *shape)
 {
 	return (shape->space == space);
 }
 
-cpBool cpSpaceContainsBody(cpSpace *space, cpBody *body)
+bool cpSpaceContainsBody(cpSpace *space, cpBody *body)
 {
 	return (body->space == space);
 }
 
-cpBool cpSpaceContainsConstraint(cpSpace *space, cpConstraint *constraint)
+bool cpSpaceContainsConstraint(cpSpace *space, cpConstraint *constraint)
 {
 	return (constraint->space == space);
 }
@@ -612,7 +612,7 @@ cpSpaceEachBody(cpSpace *space, cpSpaceBodyIteratorFunc func, void *data)
 				body = next;
 			}
 		}
-	} cpSpaceUnlock(space, cpTrue);
+	} cpSpaceUnlock(space, true);
 }
 
 typedef struct spaceShapeContext {
@@ -633,7 +633,7 @@ cpSpaceEachShape(cpSpace *space, cpSpaceShapeIteratorFunc func, void *data)
 		spaceShapeContext context = {func, data};
 		cpSpatialIndexEach(space->dynamicShapes, (cpSpatialIndexIteratorFunc)spaceEachShapeIterator, &context);
 		cpSpatialIndexEach(space->staticShapes, (cpSpatialIndexIteratorFunc)spaceEachShapeIterator, &context);
-	} cpSpaceUnlock(space, cpTrue);
+	} cpSpaceUnlock(space, true);
 }
 
 void
@@ -645,7 +645,7 @@ cpSpaceEachConstraint(cpSpace *space, cpSpaceConstraintIteratorFunc func, void *
 		for(int i=0; i<constraints->num; i++){
 			func((cpConstraint *)constraints->arr[i], data);
 		}
-	} cpSpaceUnlock(space, cpTrue);
+	} cpSpaceUnlock(space, true);
 }
 
 //MARK: Spatial Index Management

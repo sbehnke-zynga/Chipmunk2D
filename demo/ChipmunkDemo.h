@@ -46,7 +46,7 @@ frand(void)
 }
 
 static inline cpVect
-frand_unit_circle(){
+frand_unit_circle(void){
 	cpVect v = cpv(frand()*2.0f - 1.0f, frand()*2.0f - 1.0f);
 	return (cpvlengthsq(v) < 1.0f ? v : frand_unit_circle());
 }
@@ -55,8 +55,8 @@ extern int ChipmunkDemoTicks;
 extern double ChipmunkDemoTime;
 extern cpVect ChipmunkDemoKeyboard;
 extern cpVect ChipmunkDemoMouse;
-extern cpBool ChipmunkDemoRightClick;
-extern cpBool ChipmunkDemoRightDown;
+extern bool ChipmunkDemoRightClick;
+extern bool ChipmunkDemoRightDown;
 
 extern char const *ChipmunkDemoMessageString;
 void ChipmunkDemoPrintString(char const *fmt, ...);

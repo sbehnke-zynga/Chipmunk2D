@@ -91,11 +91,11 @@ cpArrayFreeEach(cpArray *arr, void (freeFunc)(void*))
 	for(int i=0; i<arr->num; i++) freeFunc(arr->arr[i]);
 }
 
-cpBool
+bool
 cpArrayContains(cpArray *arr, void *ptr)
 {
 	for(int i=0; i<arr->num; i++)
-		if(arr->arr[i] == ptr) return cpTrue;
+		if(arr->arr[i] == ptr) return true;
 	
-	return cpFalse;
+	return false;
 }

@@ -22,6 +22,7 @@
 #ifndef CHIPMUNK_TYPES_H
 #define CHIPMUNK_TYPES_H
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <float.h>
 #include <math.h>
@@ -169,24 +170,6 @@ static inline cpFloat cpflerpconst(cpFloat f1, cpFloat f2, cpFloat d)
 /// Type used internally to cache colliding object info for cpCollideShapes().
 /// Should be at least 32 bits.
 typedef uint32_t cpCollisionID;
-
-// Oh C, how we love to define our own boolean types to get compiler compatibility
-/// Chipmunk's boolean type.
-#ifdef CP_BOOL_TYPE
-	typedef CP_BOOL_TYPE cpBool;
-#else
-	typedef unsigned char cpBool;
-#endif
-
-#ifndef cpTrue
-/// true value.
-	#define cpTrue 1
-#endif
-
-#ifndef cpFalse
-/// false value.
-	#define cpFalse 0
-#endif
 
 #ifdef CP_DATA_POINTER_TYPE
 	typedef CP_DATA_POINTER_TYPE cpDataPointer;

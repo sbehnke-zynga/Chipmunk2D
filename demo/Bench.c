@@ -79,7 +79,7 @@ static void add_hexagon(cpSpace *space, int index, cpFloat radius){
 
 
 static cpSpace *
-SetupSpace_simpleTerrain(){
+SetupSpace_simpleTerrain(void){
 	cpSpace *space = BENCH_SPACE_NEW();
 	cpSpaceSetIterations(space, 10);
 	cpSpaceSetGravity(space, cpv(0, -100));
@@ -161,7 +161,7 @@ static cpSpace *init_SimpleTerrainHexagons_100(void){
 
 
 // SimpleTerrain variable sized objects
-static cpFloat rand_size(){
+static cpFloat rand_size(void){
 	return cpfpow(1.5, cpflerp(-1.5, 3.5, frand()));
 }
 
@@ -378,10 +378,10 @@ static cpSpace *init_BouncyTerrainHexagons_500(void){
 
 // No collisions
 
-static cpBool NoCollide_begin(cpArbiter *arb, cpSpace *space, void *data){
+static bool NoCollide_begin(cpArbiter *arb, cpSpace *space, void *data){
 	abort();
 	
-	return cpTrue;
+	return true;
 }
 
 

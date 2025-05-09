@@ -49,8 +49,8 @@ static ChipmunkDemo demos[32];
 static int demo_count;
 static int demo_index;
 
-static cpBool paused = cpFalse;
-static cpBool step = cpFalse;
+static bool paused = false;
+static bool step = false;
 
 static cpSpace *space;
 
@@ -60,8 +60,8 @@ int ChipmunkDemoTicks;
 double ChipmunkDemoTime;
 
 cpVect ChipmunkDemoMouse;
-cpBool ChipmunkDemoRightClick;
-cpBool ChipmunkDemoRightDown;
+bool ChipmunkDemoRightClick;
+bool ChipmunkDemoRightDown;
 cpVect ChipmunkDemoKeyboard;
 
 static cpBody *mouse_body = NULL;
@@ -302,8 +302,8 @@ Tick(double dt)
 		ChipmunkDemoTicks++;
 		ChipmunkDemoTime += dt;
 		
-		step = cpFalse;
-		ChipmunkDemoRightDown = cpFalse;
+		step = false;
+		ChipmunkDemoRightDown = false;
 		
 		ChipmunkDemoTextDrawString(cpv(-300, -200), ChipmunkDemoMessageString);
 	}
@@ -420,7 +420,7 @@ Keyboard(const sapp_event *event)
 				if(!event->key_repeat) paused = !paused;
 			} break;
 			case SAPP_KEYCODE_1: {
-				step = cpTrue;
+				step = true;
 			} break;
 			
 			case SAPP_KEYCODE_KP_4: view_translate.x += translate_increment; break;

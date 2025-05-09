@@ -72,7 +72,7 @@ extern int bench_count;
 #include <sys/time.h>
 #include <unistd.h>
 
-static double GetMilliseconds(){
+static double GetMilliseconds(void){
 	struct timeval time;
 	gettimeofday(&time, NULL);
 	
