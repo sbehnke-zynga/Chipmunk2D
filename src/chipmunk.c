@@ -275,55 +275,57 @@ cpConvexHull(int count, const cpVect *verts, cpVect *result, int *first, cpFloat
 
 //MARK: Alternate Block Iterators
 
-#if USE_BLOCKS
+#if defined(__has_extension)
+#if __has_extension(blocks)
 
 static void IteratorFunc(void *ptr, void (^block)(void *ptr)){block(ptr);}
 
 void cpSpaceEachBody_b(cpSpace *space, void (^block)(cpBody *body)){
-	cpSpaceEachBody(space, (cpSpaceBodyIteratorFunc)IteratorFunc, block);
+	cpSpaceEachBody(space, (cpSpaceBodyIteratorFunc)(void *)IteratorFunc, block);
 }
 
 void cpSpaceEachShape_b(cpSpace *space, void (^block)(cpShape *shape)){
-	cpSpaceEachShape(space, (cpSpaceShapeIteratorFunc)IteratorFunc, block);
+	cpSpaceEachShape(space, (cpSpaceShapeIteratorFunc)(void *)IteratorFunc, block);
 }
 
 void cpSpaceEachConstraint_b(cpSpace *space, void (^block)(cpConstraint *constraint)){
-	cpSpaceEachConstraint(space, (cpSpaceConstraintIteratorFunc)IteratorFunc, block);
+	cpSpaceEachConstraint(space, (cpSpaceConstraintIteratorFunc)(void *)IteratorFunc, block);
 }
 
 static void BodyIteratorFunc(cpBody *body, void *ptr, void (^block)(void *ptr)){block(ptr);}
 
 void cpBodyEachShape_b(cpBody *body, void (^block)(cpShape *shape)){
-	cpBodyEachShape(body, (cpBodyShapeIteratorFunc)BodyIteratorFunc, block);
+	cpBodyEachShape(body, (cpBodyShapeIteratorFunc)(void *)BodyIteratorFunc, block);
 }
 
 void cpBodyEachConstraint_b(cpBody *body, void (^block)(cpConstraint *constraint)){
-	cpBodyEachConstraint(body, (cpBodyConstraintIteratorFunc)BodyIteratorFunc, block);
+	cpBodyEachConstraint(body, (cpBodyConstraintIteratorFunc)(void *)BodyIteratorFunc, block);
 }
 
 void cpBodyEachArbiter_b(cpBody *body, void (^block)(cpArbiter *arbiter)){
-	cpBodyEachArbiter(body, (cpBodyArbiterIteratorFunc)BodyIteratorFunc, block);
+	cpBodyEachArbiter(body, (cpBodyArbiterIteratorFunc)(void *)BodyIteratorFunc, block);
 }
 
 static void PointQueryIteratorFunc(cpShape *shape, cpVect p, cpFloat d, cpVect g, cpSpacePointQueryBlock block){block(shape, p, d, g);}
 void cpSpacePointQuery_b(cpSpace *space, cpVect point, cpFloat maxDistance, cpShapeFilter filter, cpSpacePointQueryBlock block){
-	cpSpacePointQuery(space, point, maxDistance, filter, (cpSpacePointQueryFunc)PointQueryIteratorFunc, block);
+	cpSpacePointQuery(space, point, maxDistance, filter, (cpSpacePointQueryFunc)(void *)PointQueryIteratorFunc, block);
 }
 
 static void SegmentQueryIteratorFunc(cpShape *shape, cpVect p, cpVect n, cpFloat t, cpSpaceSegmentQueryBlock block){block(shape, p, n, t);}
 void cpSpaceSegmentQuery_b(cpSpace *space, cpVect start, cpVect end, cpFloat radius, cpShapeFilter filter, cpSpaceSegmentQueryBlock block){
-	cpSpaceSegmentQuery(space, start, end, radius, filter, (cpSpaceSegmentQueryFunc)SegmentQueryIteratorFunc, block);
+	cpSpaceSegmentQuery(space, start, end, radius, filter, (cpSpaceSegmentQueryFunc)(void *)SegmentQueryIteratorFunc, block);
 }
 
 void cpSpaceBBQuery_b(cpSpace *space, cpBB bb, cpShapeFilter filter, cpSpaceBBQueryBlock block){
-	cpSpaceBBQuery(space, bb, filter, (cpSpaceBBQueryFunc)IteratorFunc, block);
+	cpSpaceBBQuery(space, bb, filter, (cpSpaceBBQueryFunc)(void *)IteratorFunc, block);
 }
 
 static void ShapeQueryIteratorFunc(cpShape *shape, cpContactPointSet *points, cpSpaceShapeQueryBlock block){block(shape, points);}
 bool cpSpaceShapeQuery_b(cpSpace *space, cpShape *shape, cpSpaceShapeQueryBlock block){
-	return cpSpaceShapeQuery(space, shape, (cpSpaceShapeQueryFunc)ShapeQueryIteratorFunc, block);
+	return cpSpaceShapeQuery(space, shape, (cpSpaceShapeQueryFunc)(void *)ShapeQueryIteratorFunc, block);
 }
 
+#endif
 #endif
 
 #include "chipmunk/chipmunk_ffi.h"
